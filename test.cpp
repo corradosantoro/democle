@@ -4,6 +4,8 @@
 
 
 #include <iostream>
+#include <cstdlib>
+#include <unistd.h>
 
 #include "democle.h"
 
@@ -12,51 +14,71 @@ using namespace std;
 belief(coin);
 belief(amount);
 belief(amount2);
-var(X);
-var(Y);
 goal(coin50);
+procedure(p1);
+procedure(p2);
+
+
+class MyAgent : public Agent {
+public:
+    MyAgent() : Agent("myagent") { };
+    void run() {
+
+        var(X);
+        var(Y);
+
+        coin50() << (coin(50) & amount(50));
+
+        p1() >> [](Context & c) {
+            cout << "p1 in" << endl;
+            c << p2();
+            cout << "p1 out" << endl;
+        };
+
+        p2() >> [](Context & c) {
+            cout << "p2" << endl;
+        };
+
+        +coin(X) / (amount(X) & amount2(X)) >> [X](Context & c)
+        {
+            int x = c[X];
+            cout << "hello1 coin + amount " << x << endl;
+            cout << "hello2 coin + amount " << x << endl;
+            //c + coin(50, "one");
+        };
+
+        +coin(X) >> [X](Context & c) {
+            int x = c[X];
+            cout << "Other plan " << x << endl;
+        };
+
+        +coin(X, Y) >> [X,Y](Context & c)
+        {
+            int x = c[X];
+            string y = c[Y];
+            cout << "hello[2] " << x << "," << y << endl;
+        };
+
+
+    };
+};
 
 int main(int argc , char **argv)
 {
-    Engine e("main");
-
-    coin50() << (coin(50) & amount(50));
-
-    +coin(X) / (amount(X) & amount2(X)) >> [](Context & c)
-    {
-        ctx_get(int, X, c);
-        cout << "hello1 coin + amount " << X << endl;
-        cut();
-        cout << "hello2 coin + amount " << X << endl;
-        //c + coin(50, "one");
-    };
-
-    +coin(X) >> [](Context & c) {
-        ctx_get(int, X, c);
-        cout << "Other plan " << X << endl;
-    };
-
-    +coin(X, Y) >> [](Context & c)
-    {
-        ctx_get(int, X, c);
-        ctx_get(string, Y, c);
-        cout << "hello[2] " << X << "," << Y << endl;
-    };
-
+    MyAgent e;
 
     e.show_plans();
     e.start();
 
-    e + amount(30);
-    e + amount(40);
-    e + amount2(30);
+    // e + amount(30);
+    // e + amount(40);
+    // e + amount2(30);
 
-    //e + coin(10, 20, 30, "X");
-    //e + coin(X); // not valid, cannot assert a belief with an unbound var
-    e + coin(30);
-    //e + coin(50, "one");
-    e + coin(40);
-    e + coin();
+    // e + coin(30);
+    // e + coin(40);
+    // e + coin();
+
+    e << p1();
 
     sleep(1);
 

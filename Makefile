@@ -21,10 +21,13 @@ OBJS = $(SRCFILES:.cpp=.o)
 
 CXXFLAGS = #-std=c++20
 
-all: test_max sieve test_timer
+all: test_max sieve test_timer test
 
 sieve: $(OBJS) sieve.o
 	$(CXX) $(CXXFLAGS) $(OBJS) sieve.o -o $@
+
+test: $(OBJS) test.o
+	$(CXX) $(CXXFLAGS) $(OBJS) test.o -o $@
 
 test_max: $(OBJS) test_max.o
 	$(CXX) $(CXXFLAGS) $(OBJS) test_max.o -o $@
@@ -36,4 +39,4 @@ test_timer: $(OBJS) test_timer.o
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJS) test_max.o sieve.o test_timer.o test_max sieve test_timer
+	rm -f $(OBJS) test_max.o sieve.o test_timer.o test.o test_max sieve test_timer test

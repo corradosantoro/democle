@@ -23,7 +23,10 @@ Context & Context::operator-(AtomicFormula b)
 Context & Context::operator<<(AtomicFormula b)
 {
     b.make_ground(this);
-    (*engine) << b;
+    // if the call is made inside a plan (thus using the context),
+    // it is executed immediatelly and the event does not go in the event queue
+    engine->execute_event(new Event(new AtomicFormula(b), call));
+    //(*engine) << b;
     return (*this);
 }
 
@@ -33,7 +36,9 @@ MessageSender Context::operator<<(std::string dest)
     return MessageSender(this, dest);
 }
 
-flexi_type & Context::operator[](term index) {
+
+flexi_type & Context::operator[](term index)
+{
     //std::cout << "Accessing variable " << index << std::endl;
     return variables[index.name()];
 }

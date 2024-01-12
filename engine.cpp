@@ -181,85 +181,91 @@ void Engine::run()
 
         Event * evt = event_queue.pop();
 
-        DEBUG(cout << "-------------------------------------------------" << endl;)
-        DEBUG(cout << "Event queued : " << (*evt) << endl;)
+        DEBUG(cout << "-------------------------------------------------" << endl;);
+        DEBUG(cout << "Event queued : " << (*evt) << endl;);
 
-        vector<Intention *> intentions;
-
-        for (vector<Plan*>::iterator it = plans.begin(); it != plans.end(); it++) {
-            Plan * p = *it;
-            p->unbind();
-            DEBUG(cout << "   Testing " << (*p) << endl);
-            Context * c = new Context();
-            if (p->match_event(evt, c)) {
-                Condition * cond = p->get_condition();
-                if (cond != nullptr) {
-                    ContextPtrVector * context_array = new ContextPtrVector;
-                    DEBUG(cout << "-->Evaluating Condition" << endl;);
-                    bool eval_result = cond->eval(this, c, context_array);
-                    DEBUG(show_context_vector(context_array););
-                    DEBUG(cout << "-->" << endl;);
-                    if (!eval_result || context_array->size() == 0) {
-                        DEBUG(cout << "COND FALSE" << endl;);
-                        delete c;
-                        delete context_array;
-                        continue;
-                    }
-                    DEBUG(cout << "COND true" << endl;);
-                    ContextPtrVector::iterator it = context_array->begin();
-                    Context * c = (*it);
-                    it++;
-                    for (; it != context_array->end(); it++) {
-                        Context * c_to_delete = (*it);
-                        DEBUG(cout << "DELETING context " << c_to_delete << endl;);
-                        delete c_to_delete;
-                    }
-                    delete context_array;
-                    DEBUG(cout << "   Candidate Intention for the event " << (*p) << endl;);
-                    DEBUG(cout << (*c) << endl;);
-                    intentions.push_back(new Intention(p, c));
-                }
-                else {
-                    DEBUG(cout << "   Candidate Intention for the event " << (*p) << endl;);
-                    DEBUG(cout << (*c) << endl;);
-                    intentions.push_back(new Intention(p, c));
-                }
-            }
-        }
-
-        for (vector<Intention *>::iterator it = intentions.begin(); it != intentions.end(); it++) {
-            Intention * i = (*it);
-            Plan * p = i->plan();
-            Context * c = i->context();
-            c->set_engine(this);
-            c->set_sender(evt->get_belief()->get_sender());
-            DEBUG(cout << "   Executing Intention " << (*p) << endl;);
-            p->bind(c);
-            bool success = true;
-            try {
-                p->execute(c);
-            }
-            catch (CutPlanException ex) {
-                success = false;
-            }
-            p->unbind();
-            if (success)
-                break;
-
-            //cout << "   Unbound plan "  << (*p) << endl;
-        }
-
-        for (vector<Intention *>::iterator it = intentions.begin(); it != intentions.end(); it++) {
-            Intention * i = *it;
-            Plan * p = i->plan();
-            Context * c = i->context();
-            p->unbind();
-            delete c;
-            delete i;
-        }
+        execute_event(evt);
 
         delete evt;
     }
+}
+
+void Engine::execute_event(Event * evt)
+{
+    vector<Intention *> intentions;
+
+    for (vector<Plan*>::iterator it = plans.begin(); it != plans.end(); it++) {
+        Plan * p = *it;
+        p->unbind();
+        DEBUG(cout << "   Testing " << (*p) << endl);
+        Context * c = new Context();
+        if (p->match_event(evt, c)) {
+            Condition * cond = p->get_condition();
+            if (cond != nullptr) {
+                ContextPtrVector * context_array = new ContextPtrVector;
+                DEBUG(cout << "-->Evaluating Condition" << endl;);
+                bool eval_result = cond->eval(this, c, context_array);
+                DEBUG(show_context_vector(context_array););
+                DEBUG(cout << "-->" << endl;);
+                if (!eval_result || context_array->size() == 0) {
+                    DEBUG(cout << "COND FALSE" << endl;);
+                    delete c;
+                    delete context_array;
+                    continue;
+                }
+                DEBUG(cout << "COND true" << endl;);
+                ContextPtrVector::iterator it = context_array->begin();
+                Context * c = (*it);
+                it++;
+                for (; it != context_array->end(); it++) {
+                    Context * c_to_delete = (*it);
+                    DEBUG(cout << "DELETING context " << c_to_delete << endl;);
+                    delete c_to_delete;
+                }
+                delete context_array;
+                DEBUG(cout << "   Candidate Intention for the event " << (*p) << endl;);
+                DEBUG(cout << (*c) << endl;);
+                intentions.push_back(new Intention(p, c));
+            }
+            else {
+                DEBUG(cout << "   Candidate Intention for the event " << (*p) << endl;);
+                DEBUG(cout << (*c) << endl;);
+                intentions.push_back(new Intention(p, c));
+            }
+        }
+    }
+
+    for (vector<Intention *>::iterator it = intentions.begin(); it != intentions.end(); it++) {
+        Intention * i = (*it);
+        Plan * p = i->plan();
+        Context * c = i->context();
+        c->set_engine(this);
+        c->set_sender(evt->get_belief()->get_sender());
+        DEBUG(cout << "   Executing Intention " << (*p) << endl;);
+        p->bind(c);
+        bool success = true;
+        try {
+            p->execute(c);
+        }
+        catch (CutPlanException ex) {
+            success = false;
+        }
+        p->unbind();
+        if (success)
+            break;
+
+        //cout << "   Unbound plan "  << (*p) << endl;
+    }
+
+    for (vector<Intention *>::iterator it = intentions.begin(); it != intentions.end(); it++) {
+        Intention * i = *it;
+        Plan * p = i->plan();
+        Context * c = i->context();
+        p->unbind();
+        delete c;
+        delete i;
+    }
+
 }
 
 void Engine::start()

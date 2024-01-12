@@ -56,6 +56,7 @@ class Engine {
     void show_kb() { kb.show(); };
     void show_plans();
     void start();
+    void execute_event(Event * evt);
 
     string & get_name() { return name; };
 
