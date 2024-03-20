@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "debug.h"
 
+int AtomicFormula::new_count = 0;
+
 term_vector & mk_term(term_vector & terms)
 {
     return terms;
@@ -358,11 +360,13 @@ Condition AtomicFormula::operator&(AtomicFormula bel)
 
 Event::Event(AtomicFormula * b, event_type t) : bel(b),type(t),cond(nullptr)
 {
+    //cout << "Creating event " << this << "," << b << endl;
     DEBUG(cout << (*bel) << endl;)
 }
 
 Event::Event(Event & evt)
 {
+    //cout << "Creating event " << this << endl;
     bel = new AtomicFormula(*evt.bel);
     type = evt.type;
     cond = evt.cond;
@@ -371,6 +375,7 @@ Event::Event(Event & evt)
 Event::~Event()
 {
     if (bel != nullptr) {
+        //cout << "Deleting event and bel " << this << "," << bel << endl;
         delete bel;
         bel = nullptr;
     }

@@ -24,6 +24,8 @@ class Timer : public Sensor {
 
 #ifdef HAS_EMBEDDED
 
+#include <Arduino.h>
+
 class DigitalInputEventHandler {
     int event_pin;
     std::map<int, AtomicFormula *> belief_map;
@@ -31,7 +33,7 @@ class DigitalInputEventHandler {
     std::map<int, bool> event;
     std::mutex m_mutex;
     std::condition_variable m_cond;
-    std::thread * event_thread;
+    TaskHandle_t event_task;
     static DigitalInputEventHandler * _instance;
     static bool started;
 public:

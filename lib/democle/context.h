@@ -11,6 +11,7 @@
 #include <vector>
 #include <utility>
 #include "flexi_type.h"
+#include "context_collector.h"
 
 class Engine;
 class AtomicFormula;
@@ -34,9 +35,10 @@ class Context{
     Engine * engine;
     string _sender;
 public:
-    Context() : engine(nullptr),_sender("") { };
-    Context(Context & c) { engine = c.engine; variables = c.variables; _sender = c._sender; };
-    void set_engine(Engine * e) { engine = e; };
+    Context();
+    Context(Context & c);
+    ~Context();
+    void set_engine(Engine * e);
     Engine * get_engine() { return engine; };
     flexi_type & operator[](string index) {
         return variables[index];

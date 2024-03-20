@@ -20,14 +20,18 @@ void Agent::start()
 
 Engine & Agent::operator+(AtomicFormula b)
 {
+    //std::cout << "BEGIN Agent Operator +" << std::endl;
     (*e) + b;
+    //std::cout << "END Agent Operator +" << std::endl;
     return *e;
 }
 
 
 Engine & Agent::operator-(AtomicFormula b)
 {
+    //std::cout << "BEGIN Agent Operator -" << std::endl;
     (*e) - b;
+    //std::cout << "END Agent Operator -" << std::endl;
     return *e;
 }
 

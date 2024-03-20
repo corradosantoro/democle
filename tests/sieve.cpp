@@ -86,7 +86,7 @@ int main(int argc , char **argv)
     }
     s_agent << sieve();
 
-    sleep(10);
+    sleep(30);
 
     return 0;
 }

@@ -2,6 +2,9 @@
  * sensor_lib.cpp
  */
 
+#ifdef HAS_EMBEDDED
+#include <Arduino.h>
+#endif
 #include "democle_types.h"
 #include "sensor_lib.h"
 #include <unistd.h>
@@ -30,14 +33,19 @@ void digital_input_thread_start(void * x)
 
 void DigitalInputEventHandler::send_event(int pin)
 {
-    //std::unique_lock<std::mutex> lock(m_mutex);
-    event_pin = pin;
-    //m_cond.notify_one();
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    uint32_t ulStatusRegister;
+
+    xTaskNotifyIndexedFromISR( event_task,
+                               0,
+                               1 << pin,
+                               eSetBits,
+                               &xHigherPriorityTaskWoken );
+    //event_pin = pin;
 }
 
 void DigitalInputEventHandler::add(int pin, AtomicFormula * f, Agent * a)
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
     event[pin] = false;
     belief_map[pin] = f;
     agent_map[pin] = a;
@@ -48,30 +56,34 @@ void DigitalInputEventHandler::add(int pin, AtomicFormula * f, Agent * a)
 
 void DigitalInputEventHandler::start()
 {
-    event_thread = new std::thread(digital_input_thread_start, this);
-    event_thread->detach();
+    xTaskCreate((TaskFunction_t)digital_input_thread_start, "DigitalInputEventHandler",
+                    4096, this, tskIDLE_PRIORITY, &event_task);
     started = true;
 }
 
 void DigitalInputEventHandler::run()
 {
+    uint32_t notifiedValue;
     while (true) {
-        usleep(10000l);
-        {
-            std::unique_lock<std::mutex> lock(m_mutex);
-            //m_cond.wait(lock, [this]() { return event_pin >= 0; });
-
-            if (event_pin >= 0) {
+        xTaskNotifyWaitIndexed( 0,         /* Wait for 0th notification. */
+                                0x00,      /* Don't clear any notification bits on entry. */
+                                ULONG_MAX, /* Reset the notification value to 0 on exit. */
+                                &notifiedValue, /* Notified value pass out in
+                                                     ulNotifiedValue. */
+                                portMAX_DELAY );  /* Block indefinitely. */
+        for (int event_pin = 0; notifiedValue != 0; event_pin++) {
+            if ((notifiedValue & 1) != 0) {
                 int pin = event_pin;
                 Agent * a = agent_map[pin];
                 AtomicFormula * b = belief_map[pin];
+                //std::cout << "BEGIN Generating event" << std::endl;
                 (*a) + (*b);
+                //std::cout << "END Generating event" << std::endl;
                 event[pin] = false;
-                event_pin = -1;
             }
+            notifiedValue >>= 1;
         }
     }
 }
 
 #endif
-

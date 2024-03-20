@@ -6,17 +6,46 @@
 #include "engine.h"
 
 
+Context::Context() : engine(nullptr),_sender("")
+{
+    //HEAP_DEBUG_ADD(this,"Context");
+}
+
+Context::Context(Context & c)
+{
+    engine = c.engine; variables = c.variables; _sender = c._sender;
+    engine->get_collector()->add(this, "Context");
+    //HEAP_DEBUG_ADD(this,"Context");
+}
+
+
+Context::~Context()
+{
+    engine->get_collector()->clear(this);
+    //HEAP_DEBUG_DEL(this);
+}
+
+void Context::set_engine(Engine * e) {
+    engine = e;
+    e->get_collector()->add(this, "Context");
+}
+
+
 Context & Context::operator+(AtomicFormula b)
 {
+    //std::cout << "BEGIN Context Operator +" << std::endl;
     b.make_ground(this);
     (*engine) + b;
+    //std::cout << "END Context Operator +" << std::endl;
     return (*this);
 }
 
 Context & Context::operator-(AtomicFormula b)
 {
+    //std::cout << "BEGIN Context Operator -" << std::endl;
     b.make_ground(this);
     (*engine) - b;
+    //std::cout << "END Context Operator -" << std::endl;
     return (*this);
 }
 

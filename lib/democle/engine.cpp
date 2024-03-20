@@ -5,6 +5,9 @@
 //
 // DEMOCLE: DEclarative Multi-agent Open C-Language Engine
 //
+#ifdef HAS_EMBEDDED
+#include <Arduino.h>
+#endif
 
 #include "errors.h"
 #include "engine.h"
@@ -119,26 +122,35 @@ void KnowledgeBase::show()
 
 Engine & Engine::operator+(AtomicFormula b)
 {
+    //std::cout << "Engine::operator+ " << b << std::endl;
+    //std::cout << "BEGIN Engine::operator+" << std::endl;
     if (b.is_reactor()) {
+        //std::cout << "REACTOR" << std::endl;
         event_queue.push(new Event(new AtomicFormula(b), add));
+        //std::cout << "END Engine::operator+" << std::endl;
         return *this;
     }
 
-    if (kb.assert_belief(new AtomicFormula(b))) {
+    AtomicFormula * f = new AtomicFormula(b);
+    if (kb.assert_belief(f)) {
         event_queue.push(new Event(new AtomicFormula(b), add));
     }
+    else
+        delete f;
 
+    //std::cout << "END Engine::operator+" << std::endl;
     return *this;
 }
 
 Engine & Engine::operator-(AtomicFormula b)
 {
+    //std::cout << "BEGIN Engine::operator-" << std::endl;
     if (b.is_belief()) {
-        if (kb.retract_belief(new AtomicFormula(b))) {
+        if (kb.retract_belief(&b)) {
             event_queue.push(new Event(new AtomicFormula(b), del));
         }
     }
-
+    //std::cout << "END Engine::operator-" << std::endl;
     return *this;
 }
 
@@ -164,6 +176,9 @@ void thread_start(Engine * e)
     e->run();
 }
 
+void show_free_memory();
+
+
 void Engine::run()
 {
     cout << "[" << name << "] Agent started" << endl;
@@ -180,13 +195,23 @@ void Engine::run()
     while (true) {
 
         Event * evt = event_queue.pop();
+        //cout << "BEGIN-------------------------------------------------" << endl;
 
-        DEBUG(cout << "-------------------------------------------------" << endl;);
-        DEBUG(cout << "Event queued : " << (*evt) << endl;);
+        //cout << "Event queued : " << (evt->get_belief()) << endl;
 
         execute_event(evt);
 
         delete evt;
+        //cout << "END-------------------------------------------------" << endl;
+
+        //HEAP_DEBUG_SHOW();
+        //HEAP_DEBUG_CLEAR();
+
+        //collector->show_heap_debug();
+        collector->empty();
+
+        //show_free_memory();
+
     }
 }
 
@@ -199,13 +224,15 @@ void Engine::execute_event(Event * evt)
         p->unbind();
         DEBUG(cout << "   Testing " << (*p) << endl);
         Context * c = new Context();
+        c->set_engine(this);
         if (p->match_event(evt, c)) {
             Condition * cond = p->get_condition();
             if (cond != nullptr) {
+                //show_free_memory();
                 ContextPtrVector * context_array = new ContextPtrVector;
                 DEBUG(cout << "-->Evaluating Condition" << endl;);
                 bool eval_result = cond->eval(this, c, context_array);
-                DEBUG(show_context_vector(context_array););
+                //show_context_vector(context_array);
                 DEBUG(cout << "-->" << endl;);
                 if (!eval_result || context_array->size() == 0) {
                     DEBUG(cout << "COND FALSE" << endl;);
@@ -215,7 +242,7 @@ void Engine::execute_event(Event * evt)
                 }
                 DEBUG(cout << "COND true" << endl;);
                 ContextPtrVector::iterator it = context_array->begin();
-                Context * c = (*it);
+                Context * new_c = (*it);
                 it++;
                 for (; it != context_array->end(); it++) {
                     Context * c_to_delete = (*it);
@@ -225,13 +252,17 @@ void Engine::execute_event(Event * evt)
                 delete context_array;
                 DEBUG(cout << "   Candidate Intention for the event " << (*p) << endl;);
                 DEBUG(cout << (*c) << endl;);
-                intentions.push_back(new Intention(p, c));
+                //show_free_memory();
+                intentions.push_back(new Intention(p, new_c));
             }
             else {
                 DEBUG(cout << "   Candidate Intention for the event " << (*p) << endl;);
                 DEBUG(cout << (*c) << endl;);
                 intentions.push_back(new Intention(p, c));
             }
+        }
+        else {
+            delete c;
         }
     }
 
@@ -256,7 +287,6 @@ void Engine::execute_event(Event * evt)
 
         //cout << "   Unbound plan "  << (*p) << endl;
     }
-
     for (vector<Intention *>::iterator it = intentions.begin(); it != intentions.end(); it++) {
         Intention * i = *it;
         Plan * p = i->plan();
@@ -265,12 +295,15 @@ void Engine::execute_event(Event * evt)
         delete c;
         delete i;
     }
-
 }
 
 void Engine::start()
 {
+#ifdef HAS_EMBEDDED
+  xTaskCreate((TaskFunction_t)thread_start, name.c_str(), 4096, this, tskIDLE_PRIORITY, NULL);
+#else
     main_thread = new thread(thread_start, this);
     main_thread->detach();
+#endif
 }
 

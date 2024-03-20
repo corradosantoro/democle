@@ -10,6 +10,7 @@
 #include "goal.h"
 #include "plan.h"
 #include "tsqueue.h"
+#include "context_collector.h"
 
 class Agent;
 
@@ -36,17 +37,20 @@ class Engine {
     thread * main_thread;
     string name;
     Agent * agent;
+    ContextCollector * collector;
     void run();
  public:
     Engine(Agent * a) {
         agent = a;
         current = this;
         name = to_string((long)this);
+        collector = new ContextCollector(this);
     };
     Engine(Agent * a, string _nam) {
         agent = a;
         current = this;
         name = _nam;
+        collector = new ContextCollector(this);
     };
     Engine & operator+(AtomicFormula b);
     Engine & operator-(AtomicFormula b);
@@ -61,6 +65,8 @@ class Engine {
     string & get_name() { return name; };
 
     Agent * get_agent() { return agent; };
+
+    ContextCollector * get_collector() { return collector; };
 
     KnowledgeBase * knowledge() { return &kb;};
     static Engine & get_current() { return *current; };

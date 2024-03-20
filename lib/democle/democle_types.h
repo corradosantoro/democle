@@ -156,8 +156,24 @@ public:
 
 class AtomicFormula {
 public:
-    AtomicFormula(term_vector & t)  { _terms = t; ctx = nullptr; bel_type = belief_type; sender = ""; };
-    AtomicFormula(const AtomicFormula & bel) { name = bel.name; _terms = bel._terms; ctx = bel.ctx; bel_type = bel.bel_type; bool_fun = bel.bool_fun; sender = bel.sender; };
+    static int new_count;
+
+    AtomicFormula(term_vector & t)  { 
+        _terms = t; ctx = nullptr; bel_type = belief_type; sender = ""; 
+        //std::cout << "Creating AtomicFormula " << this << ", " << new_count << std::endl;
+        ++new_count;
+    };
+
+    AtomicFormula(const AtomicFormula & bel) {
+        name = bel.name; _terms = bel._terms; ctx = bel.ctx; bel_type = bel.bel_type; bool_fun = bel.bool_fun; sender = bel.sender; 
+        //std::cout << "Creating AtomicFormula " << this << ", " << new_count << std::endl;
+        ++new_count;
+    };
+
+    ~AtomicFormula() {
+        --new_count;
+        //std::cout << "DELETING AtomicFormula " << this << ", " << new_count << std::endl;
+    };
 
     void set_as_predicate() { bel_type = predicate_type; };
     void set_as_reactor() { bel_type = reactor_type; };

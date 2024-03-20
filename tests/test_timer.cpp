@@ -46,7 +46,7 @@ int main(int argc , char **argv)
     a.start();
     a.show_plans();
 
-    sleep(10);
+    sleep(20);
 
     return 0;
 }

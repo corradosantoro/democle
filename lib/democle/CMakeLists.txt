@@ -8,6 +8,8 @@ add_library (democle SHARED
   debug.h
   democle.cpp
   democle.h
+  context_collector.cpp
+  context_collector.h
   democle_types.cpp
   democle_types.h
   engine.cpp
