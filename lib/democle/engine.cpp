@@ -207,8 +207,8 @@ void Engine::run()
         //HEAP_DEBUG_SHOW();
         //HEAP_DEBUG_CLEAR();
 
-        //collector->show_heap_debug();
         collector->empty();
+        //collector->show_heap_debug();
 
         //show_free_memory();
 

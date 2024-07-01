@@ -1,9 +1,9 @@
 /*
  * C++ thread-safe queue
  */
+#include <mutex>
 #include <condition_variable>
 #include <iostream>
-#include <mutex>
 #include <queue>
 
 // Thread-safe queue

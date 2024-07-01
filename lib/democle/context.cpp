@@ -60,12 +60,6 @@ Context & Context::operator<<(AtomicFormula b)
 }
 
 
-MessageSender Context::operator<<(std::string dest)
-{
-    return MessageSender(this, dest);
-}
-
-
 flexi_type & Context::operator[](term index)
 {
     //std::cout << "Accessing variable " << index << std::endl;

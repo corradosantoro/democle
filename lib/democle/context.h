@@ -20,11 +20,14 @@ class Context;
 
 class MessageSender {
  public:
-    MessageSender(Context * ctx, std::string & dest) : destination(dest), context(ctx) { };
-    MessageSender & operator<<(AtomicFormula b);
+    MessageSender(Context * ctx, std::string dest, AtomicFormula & bel) : destination(dest), context(ctx), belief(bel) { };
+    //MessageSender & operator<<(AtomicFormula b);
+    std::string & get_destination() { return destination; };
+    AtomicFormula & get_belief() { return belief; };
  private:
     std::string destination;
     Context * context;
+    AtomicFormula & belief;
 };
 
 
@@ -51,7 +54,7 @@ public:
     Context & operator+(AtomicFormula b);
     Context & operator-(AtomicFormula b);
     Context & operator<<(AtomicFormula b);
-    MessageSender operator<<(std::string dest);
+    Context & operator<<(MessageSender msg);
 
     friend std::ostream& operator<<(std::ostream & out, Context & c);
 };
