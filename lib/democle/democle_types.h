@@ -20,6 +20,7 @@ class term {
  public:
     term(int t) : val(t), ctx(nullptr), _name(""), term_type(ground) { };
     term(string t) : val(t), ctx(nullptr), _name(""), term_type(ground) { };
+    term(const char * t) : val(t), ctx(nullptr), _name(""), term_type(ground) { };
     term(float t) : val(t), ctx(nullptr), _name(""), term_type(ground) { };
     term(double t) : val(t), ctx(nullptr), _name(""), term_type(ground) { };
     term(bool v, const char * n) : ctx(nullptr), _name(n), term_type(variable) { };
@@ -158,14 +159,14 @@ class AtomicFormula {
 public:
     static int new_count;
 
-    AtomicFormula(term_vector & t)  { 
-        _terms = t; ctx = nullptr; bel_type = belief_type; sender = ""; 
+    AtomicFormula(term_vector & t)  {
+        _terms = t; ctx = nullptr; bel_type = belief_type; sender = "";
         //std::cout << "Creating AtomicFormula " << this << ", " << new_count << std::endl;
         ++new_count;
     };
 
     AtomicFormula(const AtomicFormula & bel) {
-        name = bel.name; _terms = bel._terms; ctx = bel.ctx; bel_type = bel.bel_type; bool_fun = bel.bool_fun; sender = bel.sender; 
+        name = bel.name; _terms = bel._terms; ctx = bel.ctx; bel_type = bel.bel_type; bool_fun = bel.bool_fun; sender = bel.sender;
         //std::cout << "Creating AtomicFormula " << this << ", " << new_count << std::endl;
         ++new_count;
     };

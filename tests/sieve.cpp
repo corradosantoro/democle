@@ -79,7 +79,7 @@ int main(int argc , char **argv)
     s_agent.start();
     r_agent.start();
 
-    s_agent.show_plans();
+    //s_agent.show_plans();
 
     for (int i = 99; i >= 2;i--) {
         s_agent + number(i);
