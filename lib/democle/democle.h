@@ -6,6 +6,7 @@
 #define __DEMOCLE_H
 
 #include <string>
+#include <cstdarg>
 
 #include "democle_types.h"
 #include "goal.h"
@@ -24,7 +25,8 @@ using namespace std;
 
 class DEMOCLE {
     static DEMOCLE * _instance;
-    std::map<string, Agent *> registry;
+    std::map<string, Agent * > registry;
+    std::map<string, AbstractProtocol * > protocol_registry;
  public:
     DEMOCLE();
     static DEMOCLE * instance() {
@@ -35,11 +37,14 @@ class DEMOCLE {
     };
     void register_agent(Agent * a);
     Agent * get_agent(string name);
-    void _register_tcp_protocol();
+    void _register_tcp_protocol(va_list args);
 
-    static void register_protocol(string protocol_name) {
+    static void register_protocol(string protocol_name, ...) {
+        va_list args;
+        va_start(args, protocol_name);
         if (protocol_name == "tcp")
-            instance()->_register_tcp_protocol();
+            instance()->_register_tcp_protocol(args);
+        va_end(args);
     };
 };
 

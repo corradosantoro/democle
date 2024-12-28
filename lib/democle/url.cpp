@@ -11,21 +11,25 @@
 
 using namespace std;
 
-void url::parse(const string& url_s)
+bool url::parse(const string& url_s)
 {
+    protocol = "";
+    host = "";
+    port = "";
+    path = "";
+    query = "";
     const string prot_end("://");
     string::const_iterator prot_i = search(url_s.begin(), url_s.end(),
                                            prot_end.begin(), prot_end.end());
+    if( prot_i == url_s.end() )
+        return false;
     protocol.reserve(distance(url_s.begin(), prot_i));
     transform(url_s.begin(), prot_i,
               back_inserter(protocol),
               ptr_fun<int,int>(tolower)); // protocol is icase
-    if( prot_i == url_s.end() )
-        return;
     advance(prot_i, prot_end.length());
     string::const_iterator port_i = find(prot_i, url_s.end(), ':');
     if ( port_i == url_s.end() ) {
-        port = "";
         string::const_iterator path_i = find(prot_i, url_s.end(), '/');
         host.reserve(distance(prot_i, path_i));
         transform(prot_i, path_i,
@@ -43,4 +47,5 @@ void url::parse(const string& url_s)
         port.assign(port_i, path_i);
         path.assign(path_i, url_s.end());
     }
+    return true;
 }

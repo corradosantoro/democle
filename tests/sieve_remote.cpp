@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
+#include <string.h>
 
 #include "democle.h"
 #include "predicates.h"
@@ -50,7 +51,7 @@ public:
         sieve() >> [](Context & c)
         {
             c.show_kb();
-            c + ("receiver", test());
+            c + ("tcp://localhost:4321/receiver", test());
             c << show_primes();
         };
 
@@ -73,18 +74,31 @@ public:
 
 int main(int argc , char **argv)
 {
-    SieveAgent s_agent;
-    Receiver r_agent;
 
-    s_agent.start();
-    r_agent.start();
-
-    //s_agent.show_plans();
-
-    for (int i = 99; i >= 2;i--) {
-        s_agent + number(i);
+    if (argc == 1) {
+        fprintf(stderr, "usage: %s --sender|--receiver\n", argv[0]);
     }
-    s_agent << sieve();
+
+    if (!strcmp(argv[1],"--sender")) {
+        DEMOCLE::register_protocol("tcp", 4322);
+
+        SieveAgent s_agent;
+
+        s_agent.start();
+
+        //s_agent.show_plans();
+
+        for (int i = 99; i >= 2;i--) {
+            s_agent + number(i);
+        }
+        s_agent << sieve();
+    }
+    else {
+        DEMOCLE::register_protocol("tcp", 4321);
+
+        Receiver r_agent;
+        r_agent.start();
+    }
 
     sleep(60);
 

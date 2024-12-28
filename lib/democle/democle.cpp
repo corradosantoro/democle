@@ -23,7 +23,9 @@ Agent * DEMOCLE::get_agent(string name)
         return nullptr;
 }
 
-void DEMOCLE::_register_tcp_protocol()
+void DEMOCLE::_register_tcp_protocol(va_list args)
 {
+    int port = va_arg(args, int);
+    protocol_registry["tcp"] = new TCPProtocol(port);
 }
 

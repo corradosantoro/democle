@@ -9,11 +9,12 @@
 
 struct url {
     url(const std::string& url_s) {
-      this->parse(url_s);
+      is_good = this->parse(url_s);
     };
     std::string protocol, host, port, path, query;
+    bool is_good;
 private:
-    void parse(const std::string& url_s);
+    bool parse(const std::string& url_s);
 };
 
 #endif

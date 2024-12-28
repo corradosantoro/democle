@@ -3,6 +3,7 @@
  */
 
 #include "democle.h"
+#include "url.h"
 
 MessageSender operator,(std::string dest, AtomicFormula b)
 {
@@ -26,18 +27,28 @@ MessageSender operator,(const char * dest, AtomicFormula b)
 Context & Context::operator+(MessageSender msg)
 {
     std::string destination = msg.get_destination();
-    Agent * a = DEMOCLE::instance()->get_agent(destination);
-    AtomicFormula & b = msg.get_belief();
-    //cout << "Sending message from agent " << get_engine()->get_name() << " to agent " << destination << "," << a << endl;
 
-    if (a == nullptr)
-        throw AgentNotFoundException(destination);
+    url u(destination);
 
-    if (!a->verify_message(b))
-       throw MessageNotAcceptedException();
+    cout << u.protocol << '\t' << u.host << "\t" << u.port << "\t" << u.path << endl;
 
-    b.set_sender(this->get_engine()->get_name());
-    (*a) + b;
+    if (!u.is_good) {
+        Agent * a = DEMOCLE::instance()->get_agent(destination);
+        AtomicFormula & b = msg.get_belief();
+        //cout << "Sending message from agent " << get_engine()->get_name() << " to agent " << destination << "," << a << endl;
+
+        if (a == nullptr)
+            throw AgentNotFoundException(destination);
+
+        if (!a->verify_message(b))
+            throw MessageNotAcceptedException();
+
+        b.set_sender(this->get_engine()->get_name());
+        (*a) + b;
+    }
+    else {
+        cout << "Sending message from agent " << get_engine()->get_name() << " to remote agent " << destination << endl;
+    }
     return (*this);
 }
 
