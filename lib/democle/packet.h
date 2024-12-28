@@ -12,7 +12,11 @@ class DEMOCLEPacket {
     BinaryStream stream;
  public:
     DEMOCLEPacket();
+    DEMOCLEPacket(uint8_t * ptr, int len);
     void put(AtomicFormula a);
+    void put(std::string s);
+    void get(AtomicFormula & a);
+    void get(std::string & s);
     void dump() { stream.dump(); };
     char * data() { return (char *)stream.data(); };
     int size() { return stream.size(); };

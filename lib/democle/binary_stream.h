@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <stdint.h>
+#include <string.h>
 
 #define STREAM_SIZE 256
 
@@ -24,6 +25,11 @@ class BinaryStream {
         }
         std::cout << std::endl;
     };
+    void fill(uint8_t * ptr, int len)
+    {
+        memcpy(buffer, ptr, len);
+    };
+
     BinaryStream & operator<<(char c) {
         buffer[len++] = (uint8_t)c;
         return *this;
@@ -62,6 +68,48 @@ class BinaryStream {
             buffer[len++] = s.at(i);
         return *this;
     };
+
+    BinaryStream & operator>>(char & c) {
+        c = buffer[len++];
+        return *this;
+    };
+    BinaryStream & operator>>(int & v) {
+        uint8_t * ptr = (uint8_t *)&v;
+        ptr[0] = buffer[len++];
+        ptr[1] = buffer[len++];
+        ptr[2] = buffer[len++];
+        ptr[3] = buffer[len++];
+        return *this;
+    };
+    BinaryStream & operator>>(unsigned int & v) {
+        uint8_t * ptr = (uint8_t *)&v;
+        ptr[0] = buffer[len++];
+        ptr[1] = buffer[len++];
+        ptr[2] = buffer[len++];
+        ptr[3] = buffer[len++];
+        return *this;
+    };
+    BinaryStream & operator<<(double & v) {
+        uint8_t * ptr = (uint8_t *)&v;
+        ptr[0] = buffer[len++];
+        ptr[1] = buffer[len++];
+        ptr[2] = buffer[len++];
+        ptr[3] = buffer[len++];
+        ptr[4] = buffer[len++];
+        ptr[5] = buffer[len++];
+        ptr[6] = buffer[len++];
+        ptr[7] = buffer[len++];
+        return *this;
+    };
+    BinaryStream & operator>>(std::string & s) {
+        int lenght;
+        (*this) >> lenght;
+        s.clear();
+        for (auto i = 0; i < lenght;i++)
+            s.push_back((char)buffer[len++]);
+        return *this;
+    };
+
 };
 
 

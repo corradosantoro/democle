@@ -35,6 +35,7 @@ bool url::parse(const string& url_s)
         transform(prot_i, path_i,
                   back_inserter(host),
                   ptr_fun<int,int>(tolower)); // host is icase
+        advance(path_i, 1);
         path.assign(path_i, url_s.end());
     }
     else {
@@ -45,6 +46,7 @@ bool url::parse(const string& url_s)
         advance(port_i, 1);
         string::const_iterator path_i = find(port_i, url_s.end(), '/');
         port.assign(port_i, path_i);
+        advance(path_i, 1);
         path.assign(path_i, url_s.end());
     }
     return true;

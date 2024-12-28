@@ -76,4 +76,10 @@ class ProtocolNotStartedException : public exception {
     const char * what() { return "Protocol not started"; };
 };
 
+class InvalidMagicNumber : public exception {
+ public:
+    InvalidMagicNumber() { };
+    const char * what() { return "Invalid packet magic number"; };
+};
+
 #endif

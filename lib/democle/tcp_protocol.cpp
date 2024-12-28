@@ -110,6 +110,19 @@ void TCPProtocol::run()
         char buffer[1024];
         ssize_t valread = read(new_socket, buffer, 1024);
         std::cout << "Received bytes: " << valread << std::endl;
+        for (auto i = 0; i < valread;i++)
+            std::cout << std::hex << (unsigned int)buffer[i] << std::dec << " ";
+        std::cout << std::endl;
+
+        DEMOCLEPacket p((uint8_t *)buffer, valread);
+        std::string agent;
+        term_vector t;
+        AtomicFormula af(t);
+        p.get(agent);
+        p.get(af);
+
+        std::cout << "Agent : " << agent << ", AtomicFormula : " << af << std::endl;
+
         close(new_socket);
     }
 }
@@ -123,7 +136,7 @@ void TCPProtocol::send_message(url & destination, AtomicFormula & a)
 
     if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("client socket failed");
-        exit(EXIT_FAILURE);
+        return;
     }
 
     memset(&address, 0, sizeof(address));
@@ -136,6 +149,7 @@ void TCPProtocol::send_message(url & destination, AtomicFormula & a)
         return;
     }
     DEMOCLEPacket p;
+    p.put(destination.path);
     p.put(a);
     send(client_fd, p.data(), p.size(), 0);
     close(client_fd);
