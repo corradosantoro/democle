@@ -49,8 +49,8 @@ public:
 
         sieve() >> [](Context & c)
         {
-            //c.show_kb();
-            c << ("receiver", test());
+            c.show_kb();
+            c + ("receiver", test());
             c << show_primes();
         };
 
@@ -86,7 +86,7 @@ int main(int argc , char **argv)
     }
     s_agent << sieve();
 
-    sleep(30);
+    sleep(60);
 
     return 0;
 }

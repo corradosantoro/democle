@@ -52,12 +52,16 @@ public:
     string & sender() { return _sender; };
     void set_sender(string & s) { _sender = s; };
     Context & operator+(AtomicFormula b);
+    Context & operator+(MessageSender msg);
     Context & operator-(AtomicFormula b);
     Context & operator<<(AtomicFormula b);
-    Context & operator<<(MessageSender msg);
 
     friend std::ostream& operator<<(std::ostream & out, Context & c);
 };
+
+MessageSender operator,(std::string dest, AtomicFormula b);
+MessageSender operator,(char * dest, AtomicFormula b);
+MessageSender operator,(const char * dest, AtomicFormula b);
 
 std::ostream& operator<<(std::ostream & out, Context & c);
 
