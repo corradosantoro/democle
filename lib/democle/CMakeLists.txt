@@ -33,6 +33,8 @@ add_library (democle SHARED
   binary_stream.h
   packet.h
   packet.cpp
+  url.cpp
+  url.h
   tsqueue.h
   )
 
@@ -58,6 +60,7 @@ file (GLOB HEADERS
   protocol.h
   binary_stream.h
   packet.h
+  url.h
   )
 install(FILES ${HEADERS} DESTINATION include)
 
