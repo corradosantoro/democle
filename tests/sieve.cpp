@@ -79,6 +79,10 @@ int main(int argc , char **argv)
     s_agent.start();
     r_agent.start();
 
+    DEMOCLEPacket p;
+    p.put(number(10));
+    p.dump();
+
     //s_agent.show_plans();
 
     for (int i = 99; i >= 2;i--) {

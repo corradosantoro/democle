@@ -15,6 +15,7 @@
 #include "sensor.h"
 #include "sensor_lib.h"
 #include "protocol.h"
+#include "packet.h"
 #include "errors.h"
 
 #include <map>

@@ -30,6 +30,9 @@ add_library (democle SHARED
   sensor_lib.h
   protocol.h
   tcp_protocol.cpp
+  binary_stream.h
+  packet.h
+  packet.cpp
   tsqueue.h
   )
 
@@ -53,6 +56,8 @@ file (GLOB HEADERS
   sensor_lib.h
   tsqueue.h
   protocol.h
+  binary_stream.h
+  packet.h
   )
 install(FILES ${HEADERS} DESTINATION include)
 
