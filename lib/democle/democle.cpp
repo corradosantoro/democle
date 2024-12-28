@@ -23,3 +23,7 @@ Agent * DEMOCLE::get_agent(string name)
         return nullptr;
 }
 
+void DEMOCLE::_register_tcp_protocol()
+{
+}
+

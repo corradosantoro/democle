@@ -14,6 +14,7 @@
 #include "agent.h"
 #include "sensor.h"
 #include "sensor_lib.h"
+#include "protocol.h"
 #include "errors.h"
 
 #include <map>
@@ -33,6 +34,12 @@ class DEMOCLE {
     };
     void register_agent(Agent * a);
     Agent * get_agent(string name);
+    void _register_tcp_protocol();
+
+    static void register_protocol(string protocol_name) {
+        if (protocol_name == "tcp")
+            instance()->_register_tcp_protocol();
+    };
 };
 
 
