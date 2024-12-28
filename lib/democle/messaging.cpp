@@ -27,6 +27,7 @@ MessageSender operator,(const char * dest, AtomicFormula b)
 Context & Context::operator+(MessageSender msg)
 {
     std::string destination = msg.get_destination();
+    AtomicFormula & b = msg.get_belief();
 
     url u(destination);
 
@@ -34,7 +35,6 @@ Context & Context::operator+(MessageSender msg)
 
     if (!u.is_good) {
         Agent * a = DEMOCLE::instance()->get_agent(destination);
-        AtomicFormula & b = msg.get_belief();
         //cout << "Sending message from agent " << get_engine()->get_name() << " to agent " << destination << "," << a << endl;
 
         if (a == nullptr)
@@ -48,6 +48,7 @@ Context & Context::operator+(MessageSender msg)
     }
     else {
         cout << "Sending message from agent " << get_engine()->get_name() << " to remote agent " << destination << endl;
+        DEMOCLE::send_message(u, b);
     }
     return (*this);
 }

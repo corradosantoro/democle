@@ -14,6 +14,8 @@ class DEMOCLEPacket {
     DEMOCLEPacket();
     void put(AtomicFormula a);
     void dump() { stream.dump(); };
+    char * data() { return (char *)stream.data(); };
+    int size() { return stream.size(); };
 };
 
 

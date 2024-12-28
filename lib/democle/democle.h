@@ -15,6 +15,7 @@
 #include "agent.h"
 #include "sensor.h"
 #include "sensor_lib.h"
+#include "url.h"
 #include "protocol.h"
 #include "packet.h"
 #include "errors.h"
@@ -38,6 +39,7 @@ class DEMOCLE {
     void register_agent(Agent * a);
     Agent * get_agent(string name);
     void _register_tcp_protocol(va_list args);
+    void _send_message(url & destination, AtomicFormula & b);
 
     static void register_protocol(string protocol_name, ...) {
         va_list args;
@@ -45,6 +47,9 @@ class DEMOCLE {
         if (protocol_name == "tcp")
             instance()->_register_tcp_protocol(args);
         va_end(args);
+    };
+    static void send_message(url & destination, AtomicFormula & b) {
+        instance()->_send_message(destination, b);
     };
 };
 

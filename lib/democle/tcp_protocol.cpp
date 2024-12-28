@@ -8,7 +8,54 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+int lookup_host (const char *host, struct sockaddr_in * destination_address, int * destination_address_length)
+{
+    struct addrinfo hints, *res, *result;
+    int errcode;
+    char addrstr[100];
+    void *ptr;
+
+    memset (&hints, 0, sizeof (hints));
+    hints.ai_family = PF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags |= AI_CANONNAME;
+
+    errcode = getaddrinfo (host, NULL, &hints, &result);
+    if (errcode != 0) {
+        perror ("getaddrinfo");
+        return -1;
+    }
+
+    res = result;
+
+    while (res) {
+        switch (res->ai_family) {
+        case AF_INET:
+            *destination_address = *((struct sockaddr_in *) res->ai_addr);
+            *destination_address_length = res->ai_addrlen;
+            freeaddrinfo(result);
+
+            // destination_socket = socket(AF_INET, SOCK_DGRAM, 0);
+
+            return 0;
+            // //case AF_INET6:
+            // ptr = &((struct sockaddr_in6 *) res->ai_addr)->sin6_addr;
+            // break;
+        }
+        res = res->ai_next;
+    }
+
+    freeaddrinfo(result);
+
+    return -1;
+}
+
 
 
 void tcp_thread_start(TCPProtocol * p)
@@ -60,15 +107,37 @@ void TCPProtocol::run()
             perror("accept");
             continue;
         }
-        // ssize_t valread = read(new_socket, buffer, BUFFER_SIZE);
-        // std::cout << "Received: " << buffer << std::endl;
-        // send(new_socket, buffer, valread, 0);
-        // std::cout << "Echo message sent" << std::endl;
+        char buffer[1024];
+        ssize_t valread = read(new_socket, buffer, 1024);
+        std::cout << "Received bytes: " << valread << std::endl;
         close(new_socket);
     }
 }
 
-void TCPProtocol::send_message(std::string & destination, AtomicFormula & a)
+void TCPProtocol::send_message(url & destination, AtomicFormula & a)
 {
+    int client_fd;
+    struct sockaddr_in address;
+    int opt = 1;
+    socklen_t addrlen = sizeof(address);
+
+    if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("client socket failed");
+        exit(EXIT_FAILURE);
+    }
+
+    memset(&address, 0, sizeof(address));
+    int len;
+    lookup_host(destination.host.c_str(), &address, &len);
+    address.sin_port = htons(atoi(destination.port.c_str()));
+
+    if (connect(client_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+        std::cerr << "Connection Failed" << std::endl;
+        return;
+    }
+    DEMOCLEPacket p;
+    p.put(a);
+    send(client_fd, p.data(), p.size(), 0);
+    close(client_fd);
 }
 

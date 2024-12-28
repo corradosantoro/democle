@@ -70,4 +70,10 @@ class BadMessageSyntaxException : public exception {
     const char * what() { return reason.c_str(); };
 };
 
+class ProtocolNotStartedException : public exception {
+ public:
+    ProtocolNotStartedException() { };
+    const char * what() { return "Protocol not started"; };
+};
+
 #endif

@@ -10,7 +10,7 @@
 class AbstractProtocol {
  public:
     AbstractProtocol() { };
-    virtual void send_message(std::string & destination, AtomicFormula & a) = 0;
+    virtual void send_message(url & destination, AtomicFormula & a) = 0;
 };
 
 class TCPProtocol : public AbstractProtocol {
@@ -18,7 +18,7 @@ class TCPProtocol : public AbstractProtocol {
     thread * tcp_thread;
  public:
     TCPProtocol(int port_num);
-    virtual void send_message(std::string & destination, AtomicFormula & a) override;
+    virtual void send_message(url & destination, AtomicFormula & a) override;
     void run();
 };
 

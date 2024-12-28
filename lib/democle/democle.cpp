@@ -29,3 +29,14 @@ void DEMOCLE::_register_tcp_protocol(va_list args)
     protocol_registry["tcp"] = new TCPProtocol(port);
 }
 
+void DEMOCLE::_send_message(url & destination, AtomicFormula & b)
+{
+    if (protocol_registry.count(destination.protocol)) {
+        AbstractProtocol * p = protocol_registry[destination.protocol];
+        p->send_message(destination, b);
+    }
+    else
+        throw new ProtocolNotStartedException();
+}
+
+

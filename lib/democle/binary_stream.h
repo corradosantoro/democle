@@ -16,6 +16,8 @@ class BinaryStream {
     uint8_t buffer[STREAM_SIZE];
  public:
     BinaryStream() : len(0) { };
+    int size() { return len; };
+    uint8_t * data() { return buffer; };
     void dump() {
         for (auto i = 0; i < len;i++) {
             std::cout << std::hex << (int)buffer[i] << std::dec << " ";
