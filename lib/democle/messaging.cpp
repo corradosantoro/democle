@@ -34,17 +34,7 @@ Context & Context::operator+(MessageSender msg)
     cout << u.protocol << '\t' << u.host << "\t" << u.port << "\t" << u.path << endl;
 
     if (!u.is_good) {
-        Agent * a = DEMOCLE::instance()->get_agent(destination);
-        //cout << "Sending message from agent " << get_engine()->get_name() << " to agent " << destination << "," << a << endl;
-
-        if (a == nullptr)
-            throw AgentNotFoundException(destination);
-
-        if (!a->verify_message(b))
-            throw MessageNotAcceptedException();
-
-        b.set_sender(this->get_engine()->get_name());
-        (*a) + b;
+        DEMOCLE::put_message_in_queue(destination, this->get_engine()->get_name(), b);
     }
     else {
         cout << "Sending message from agent " << get_engine()->get_name() << " to remote agent " << destination << endl;

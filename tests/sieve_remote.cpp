@@ -17,6 +17,7 @@ belief(number);
 reactor(test);
 procedure(sieve);
 procedure(show_primes);
+procedure(go);
 
 class Receiver : public Agent {
 public:
@@ -24,6 +25,11 @@ public:
     void run() {
 
         accepts(test/0);
+
+        go() >> [](Context & c)
+        {
+            c + ("receiver", test());
+        };
 
         +test() >> [] (Context & c)
         {
@@ -50,7 +56,7 @@ public:
 
         sieve() >> [](Context & c)
         {
-            c.show_kb();
+            //c.show_kb();
             c + ("tcp://localhost:4321/receiver", test());
             c << show_primes();
         };
@@ -102,6 +108,7 @@ int main(int argc , char **argv)
         Receiver r_agent;
         r_agent.start();
 
+        //r_agent << go();
     }
 
     sleep(60);

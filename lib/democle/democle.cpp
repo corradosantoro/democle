@@ -39,4 +39,20 @@ void DEMOCLE::_send_message(url & destination, AtomicFormula & b)
         throw new ProtocolNotStartedException();
 }
 
+void DEMOCLE::_put_message_in_queue(string & destination_agent, string & sender_agent, AtomicFormula & b)
+{
+    Agent * a = DEMOCLE::instance()->get_agent(destination_agent);
+
+    if (a == nullptr)
+        throw AgentNotFoundException(destination_agent);
+
+    cout << "Sending message from agent " << sender_agent << " to agent " << a->get_name() << "," << b << endl;
+    // if (!a->verify_message(b))
+    //     throw MessageNotAcceptedException();
+
+    b.set_sender(sender_agent);
+    (*a) + b;
+}
+
+
 

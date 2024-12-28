@@ -123,6 +123,8 @@ void TCPProtocol::run()
 
         std::cout << "Agent : " << agent << ", AtomicFormula : " << af << std::endl;
 
+        DEMOCLE::put_message_in_queue(agent, agent, af);
+
         close(new_socket);
     }
 }

@@ -15,6 +15,11 @@ using namespace std;
 
 class Sensor;
 
+typedef struct {
+    char name[64];
+    int arity;
+} t_message_template;
+
 class Agent {
  public:
     Agent(string _name);
@@ -38,7 +43,7 @@ class Agent {
  private:
     Engine * e;
     string name;
-    vector<pair<string, int>> accepted_messages;
+    vector<t_message_template> accepted_messages;
 };
 
 #endif

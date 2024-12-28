@@ -44,17 +44,22 @@ Engine & Agent::operator<<(AtomicFormula b)
 
 bool Agent::verify_message(AtomicFormula & b)
 {
-    for (auto it = accepted_messages.begin(); it != accepted_messages.end(); it++) {
-        if (it->first == b.get_name() && it->second == b.arity())
-            return true;
+    cout << "SONO QUI" << endl;
+    for (std::vector<t_message_template>::iterator it = accepted_messages.begin(); it != accepted_messages.end(); it++) {
+        t_message_template mt = *it;
+        cout << "AM: " << mt.name << "," << mt.arity << endl;
+
+        //if ( (*it) == b.get_name() ) //&& mt->arity == b.arity())
+        //     return true;
     }
-    return false;
+    return true;
 }
 
 
 void Agent::accept_messages(int x,...)
 {
     va_list args;
+    std::string bel_name;
     va_start(args, x);
 
     const char * c = va_arg(args, const char *);
@@ -64,12 +69,23 @@ void Agent::accept_messages(int x,...)
         int pos;
         if ( (pos = s.find("/")) == string::npos)
             throw BadMessageSyntaxException(s);
-        string bel_name = s.substr(0, pos);
+        bel_name = s.substr(0, pos);
         int arity = stoi(s.substr(pos+1));
-        accepted_messages.push_back(make_pair(bel_name, arity));
+        t_message_template mt;
+        strcpy(mt.name,bel_name.c_str());
+        mt.arity = arity;
+        accepted_messages.push_back(mt);
         c = va_arg(args, const char *);
     }
 
     va_end(args);
+
+    // for (auto it = accepted_messages.begin(); it != accepted_messages.end(); it++) {
+    //     t_message_template mt = *it;
+    //     cout << mt.name << "," << mt.arity << endl;
+    // }
+    // for (auto it = accepted_message_names.begin(); it != accepted_message_names.end(); it++) {
+    //     cout << (*it) << endl;
+    // }
 }
 

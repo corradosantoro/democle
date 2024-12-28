@@ -49,7 +49,7 @@ public:
 
         sieve() >> [](Context & c)
         {
-            c.show_kb();
+            //c.show_kb();
             c + ("receiver", test());
             c << show_primes();
         };
