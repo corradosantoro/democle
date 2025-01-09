@@ -34,7 +34,6 @@ class Engine {
     vector<Plan*> plans;
     vector<Goal*> goals;
     TSQueue<Event*> event_queue;
-    thread * main_thread;
     string name;
     Agent * agent;
     ContextCollector * collector;
@@ -71,8 +70,6 @@ class Engine {
     KnowledgeBase * knowledge() { return &kb;};
     static Engine & get_current() { return *current; };
     static void set_current(Engine * e) { current = e; };
-
-    friend void thread_start(Engine * e);
 
 };
 

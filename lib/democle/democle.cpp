@@ -46,9 +46,9 @@ void DEMOCLE::_put_message_in_queue(string & destination_agent, string & sender_
     if (a == nullptr)
         throw AgentNotFoundException(destination_agent);
 
-    cout << "Sending message from agent " << sender_agent << " to agent " << a->get_name() << "," << b << endl;
-    // if (!a->verify_message(b))
-    //     throw MessageNotAcceptedException();
+    //cout << "Sending message from agent " << sender_agent << " to agent " << a->get_name() << "," << b << endl;
+    if (!a->verify_message(b))
+        throw MessageNotAcceptedException();
 
     b.set_sender(sender_agent);
     (*a) + b;

@@ -15,6 +15,8 @@
 #include "sensor.h"
 #include "debug.h"
 
+#include <unistd.h>
+
 Engine * Engine::current = nullptr;
 
 bool KnowledgeBase::assert_belief(AtomicFormula * bel)
@@ -171,11 +173,6 @@ void Engine::show_plans()
     }
 }
 
-void thread_start(Engine * e)
-{
-    e->run();
-}
-
 void show_free_memory();
 
 
@@ -299,11 +296,6 @@ void Engine::execute_event(Event * evt)
 
 void Engine::start()
 {
-#ifdef HAS_EMBEDDED
-  xTaskCreate((TaskFunction_t)thread_start, name.c_str(), 4096, this, tskIDLE_PRIORITY, NULL);
-#else
-    main_thread = new thread(thread_start, this);
-    main_thread->detach();
-#endif
+    run();
 }
 

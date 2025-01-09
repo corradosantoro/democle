@@ -7,15 +7,30 @@
 
 Agent::Agent(string _name) : name(_name)
 {
+    accepted_messages = new t_message_template[64];
+    accepted_messages_index = 0;
     e = new Engine(this, name);
     DEMOCLE::instance()->register_agent(this);
 }
 
+void * thread_start(void * x)
+{
+    Agent * a = reinterpret_cast<Agent *>(x);
+    //a->dump_accepted_messages();
+    a->get_engine()->start();
+}
+
+
 void Agent::start()
 {
     Engine::set_current(e);
+#ifdef HAS_EMBEDDED
+    xTaskCreate((TaskFunction_t)thread_start, name.c_str(), 4096, this, tskIDLE_PRIORITY, NULL);
+#else
     run();
-    e->start();
+    main_thread = new thread(thread_start, this);
+    main_thread->detach();
+#endif
 }
 
 Engine & Agent::operator+(AtomicFormula b)
@@ -44,20 +59,20 @@ Engine & Agent::operator<<(AtomicFormula b)
 
 bool Agent::verify_message(AtomicFormula & b)
 {
-    cout << "SONO QUI" << endl;
-    for (std::vector<t_message_template>::iterator it = accepted_messages.begin(); it != accepted_messages.end(); it++) {
-        t_message_template mt = *it;
-        cout << "AM: " << mt.name << "," << mt.arity << endl;
+    for (int it = 0; it < accepted_messages_index; it++) {
+        t_message_template * mt = &accepted_messages[it];
+        //cout << "AM: " << mt->name << "," << mt->arity << endl;
 
-        //if ( (*it) == b.get_name() ) //&& mt->arity == b.arity())
-        //     return true;
+        if ( !strcmp(mt->name, b.get_name().c_str()) && mt->arity == b.arity())
+            return true;
     }
-    return true;
+    return false;
 }
 
 
 void Agent::accept_messages(int x,...)
 {
+
     va_list args;
     std::string bel_name;
     va_start(args, x);
@@ -74,18 +89,31 @@ void Agent::accept_messages(int x,...)
         t_message_template mt;
         strcpy(mt.name,bel_name.c_str());
         mt.arity = arity;
-        accepted_messages.push_back(mt);
+        //accepted_messages.push_back(mt);
+        accepted_messages[accepted_messages_index++] = mt;
         c = va_arg(args, const char *);
     }
 
     va_end(args);
 
-    // for (auto it = accepted_messages.begin(); it != accepted_messages.end(); it++) {
-    //     t_message_template mt = *it;
-    //     cout << mt.name << "," << mt.arity << endl;
-    // }
+    //dump_accepted_messages();
     // for (auto it = accepted_message_names.begin(); it != accepted_message_names.end(); it++) {
     //     cout << (*it) << endl;
     // }
 }
 
+void Agent::dump_accepted_messages()
+{
+    cout << "--------------------------------------------------------" << endl;
+    cout << "Name : " << name << endl;
+    cout << "--------------------------------------------------------" << endl;
+    // for (auto it = accepted_messages.begin(); it != accepted_messages.end(); it++) {
+    //     t_message_template mt = *it;
+    //     cout << mt.name << "," << mt.arity << endl;
+    // }
+    for (auto it = 0; it < accepted_messages_index; it++) {
+        t_message_template mt = accepted_messages[it];
+        cout << mt.name << "," << mt.arity << endl;
+    }
+    cout << "--------------------------------------------------------" << endl;
+}

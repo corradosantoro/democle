@@ -6,6 +6,7 @@
 #define __AGENT_H
 
 #include <string>
+#include <mutex>
 #include "engine.h"
 
 using namespace std;
@@ -33,17 +34,24 @@ class Agent {
     Engine & operator<<(AtomicFormula b);
     bool verify_message(AtomicFormula & b);
     vector<Sensor *> & get_sensors() { return sensors; };
+    void dump_accepted_messages();
+    Engine * get_engine() { return e; };
 
     friend Engine & operator+(Agent * a, AtomicFormula b) { return (*a) + b; };
     friend Engine & operator-(Agent * a, AtomicFormula b) { return (*a) - b; };
     friend Engine & operator<<(Agent * a, AtomicFormula b) { return (*a) << b; };
+ private:
+    string name;
+    //vector<t_message_template> accepted_messages;
+    t_message_template * accepted_messages;
+    int accepted_messages_index;
+    thread * main_thread;
+    Engine * e;
  protected:
     void accept_messages(int x,...);
     vector<Sensor *> sensors;
- private:
-    Engine * e;
-    string name;
-    vector<t_message_template> accepted_messages;
+    friend void * thread_start(void * x);
+
 };
 
 #endif

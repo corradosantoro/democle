@@ -31,13 +31,12 @@ Context & Context::operator+(MessageSender msg)
 
     url u(destination);
 
-    cout << u.protocol << '\t' << u.host << "\t" << u.port << "\t" << u.path << endl;
-
     if (!u.is_good) {
         DEMOCLE::put_message_in_queue(destination, this->get_engine()->get_name(), b);
     }
     else {
-        cout << "Sending message from agent " << get_engine()->get_name() << " to remote agent " << destination << endl;
+        //cout << u.protocol << '\t' << u.host << "\t" << u.port << "\t" << u.path << endl;
+        //cout << "Sending message from agent " << get_engine()->get_name() << " to remote agent " << destination << endl;
         DEMOCLE::send_message(u, b);
     }
     return (*this);

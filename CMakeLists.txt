@@ -29,7 +29,7 @@ add_subdirectory (tests)
 #   net_utils.cpp
 #   main.cpp )
 
-# add_compile_options(-O3)
+add_compile_options(-g)
 
 # target_link_libraries( detector ${OpenCV_LIBS} ${YAML_CPP_LIBRARIES} )
 # if(THREADS_HAVE_PTHREAD_ARG)
