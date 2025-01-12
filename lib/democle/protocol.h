@@ -10,15 +10,16 @@
 class AbstractProtocol {
  public:
     AbstractProtocol() { };
-    virtual void send_message(url & destination, AtomicFormula & a) = 0;
+    virtual void send_message(Agent * sender, url & destination, AtomicFormula & a) = 0;
 };
 
 class TCPProtocol : public AbstractProtocol {
     int port_number;
     thread * tcp_thread;
+    int server_fd;
  public:
     TCPProtocol(int port_num);
-    virtual void send_message(url & destination, AtomicFormula & a) override;
+    virtual void send_message(Agent * sender, url & destination, AtomicFormula & a) override;
     void run();
 };
 

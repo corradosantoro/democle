@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -73,7 +74,7 @@ TCPProtocol::TCPProtocol(int port_num)
 
 void TCPProtocol::run()
 {
-    int server_fd, new_socket;
+    int new_socket;
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);
@@ -109,30 +110,32 @@ void TCPProtocol::run()
         }
         char buffer[1024];
         ssize_t valread = read(new_socket, buffer, 1024);
-        std::cout << "Received bytes: " << valread << std::endl;
-        for (auto i = 0; i < valread;i++)
-            std::cout << std::hex << (unsigned int)buffer[i] << std::dec << " ";
-        std::cout << std::endl;
+        // std::cout << "Received bytes: " << valread << std::endl;
+        // for (auto i = 0; i < valread;i++)
+        //     std::cout << std::hex << (unsigned int)buffer[i] << std::dec << " ";
+        // std::cout << std::endl;
 
         DEMOCLEPacket p((uint8_t *)buffer, valread);
-        std::string agent;
+        std::string sender_agent_name, dest_agent_name;
         term_vector t;
         AtomicFormula af(t);
-        p.get(agent);
+        p.get(sender_agent_name);
+        p.get(dest_agent_name);
         p.get(af);
 
-        std::cout << "Agent : " << agent << ", AtomicFormula : " << af << std::endl;
+        // std::cout << "Agent : " << dest_agent_name << ", AtomicFormula : " << af << std::endl;
 
-        DEMOCLE::put_message_in_queue(agent, agent, af);
+        DEMOCLE::put_message_in_queue(dest_agent_name, sender_agent_name, af);
 
         close(new_socket);
     }
 }
 
-void TCPProtocol::send_message(url & destination, AtomicFormula & a)
+
+void TCPProtocol::send_message(Agent * sender, url & destination, AtomicFormula & a)
 {
     int client_fd;
-    struct sockaddr_in address;
+    struct sockaddr_in address, peer_address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);
 
@@ -150,7 +153,14 @@ void TCPProtocol::send_message(url & destination, AtomicFormula & a)
         std::cerr << "Connection Failed" << std::endl;
         return;
     }
+
+    socklen_t peer_address_len;
+    char s[64];
+    getpeername(client_fd, (struct sockaddr *)&peer_address, &peer_address_len);
+    inet_ntop(AF_INET, &peer_address.sin_addr, s, 63);
+    std::string source_url = "tcp://" + string(s) + ":" + std::to_string(port_number) + "/" + sender->get_name();
     DEMOCLEPacket p;
+    p.put(source_url);
     p.put(destination.path);
     p.put(a);
     send(client_fd, p.data(), p.size(), 0);

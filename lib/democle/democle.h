@@ -39,7 +39,7 @@ class DEMOCLE {
     void register_agent(Agent * a);
     Agent * get_agent(string name);
     void _register_tcp_protocol(va_list args);
-    void _send_message(url & destination, AtomicFormula & b);
+    void _send_message(Agent * sender, url & destination, AtomicFormula & b);
     void _put_message_in_queue(string & destination_agent, string & sender_agent, AtomicFormula & b);
 
     static void register_protocol(string protocol_name, ...) {
@@ -50,8 +50,8 @@ class DEMOCLE {
         va_end(args);
     };
 
-    static void send_message(url & destination, AtomicFormula & b) {
-        instance()->_send_message(destination, b);
+    static void send_message(Agent * sender, url & destination, AtomicFormula & b) {
+        instance()->_send_message(sender, destination, b);
     };
 
     static void put_message_in_queue(string & destination_agent, string & sender_agent, AtomicFormula & b) {

@@ -37,7 +37,8 @@ Context & Context::operator+(MessageSender msg)
     else {
         //cout << u.protocol << '\t' << u.host << "\t" << u.port << "\t" << u.path << endl;
         //cout << "Sending message from agent " << get_engine()->get_name() << " to remote agent " << destination << endl;
-        DEMOCLE::send_message(u, b);
+        Agent * a = engine->get_agent();
+        DEMOCLE::send_message(a, u, b);
     }
     return (*this);
 }
