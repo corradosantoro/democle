@@ -38,15 +38,19 @@ class DEMOCLE {
     };
     void register_agent(Agent * a);
     Agent * get_agent(string name);
+#ifndef HAS_EMBEDDED
     void _register_tcp_protocol(va_list args);
+#endif
     void _send_message(Agent * sender, url & destination, AtomicFormula & b);
     void _put_message_in_queue(string & destination_agent, string & sender_agent, AtomicFormula & b);
 
     static void register_protocol(string protocol_name, ...) {
         va_list args;
         va_start(args, protocol_name);
+#ifndef HAS_EMBEDDED
         if (protocol_name == "tcp")
             instance()->_register_tcp_protocol(args);
+#endif
         va_end(args);
     };
 

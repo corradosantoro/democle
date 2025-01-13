@@ -23,12 +23,14 @@ Agent * DEMOCLE::get_agent(string name)
         return nullptr;
 }
 
+#ifndef HAS_EMBEDDED
 void DEMOCLE::_register_tcp_protocol(va_list args)
 {
     char * host = va_arg(args, char *);
     int port = va_arg(args, int);
     protocol_registry["tcp"] = new TCPProtocol(host, port);
 }
+#endif
 
 void DEMOCLE::_send_message(Agent * sender, url & destination, AtomicFormula & b)
 {

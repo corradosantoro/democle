@@ -13,6 +13,7 @@ class AbstractProtocol {
     virtual void send_message(Agent * sender, url & destination, AtomicFormula & a) = 0;
 };
 
+#ifndef HAS_EMBEDDED
 class TCPProtocol : public AbstractProtocol {
     int port_number;
     string host;
@@ -24,4 +25,5 @@ class TCPProtocol : public AbstractProtocol {
     void run();
 };
 
+#endif
 #endif

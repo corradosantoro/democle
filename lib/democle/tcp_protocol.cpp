@@ -4,6 +4,7 @@
 
 #include "democle.h"
 
+#ifndef HAS_EMBEDDED
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -163,3 +164,4 @@ void TCPProtocol::send_message(Agent * sender, url & destination, AtomicFormula 
     close(client_fd);
 }
 
+#endif
