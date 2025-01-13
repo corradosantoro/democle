@@ -25,6 +25,7 @@ DEMOCLEPacket::DEMOCLEPacket(uint8_t * ptr, int len)
 void DEMOCLEPacket::put(AtomicFormula a)
 {
     stream << a.get_name();
+    stream << (int)a.is_reactor();
 }
 
 void DEMOCLEPacket::put(std::string s)
@@ -32,11 +33,20 @@ void DEMOCLEPacket::put(std::string s)
     stream << s;
 }
 
+void DEMOCLEPacket::put(int s)
+{
+    stream << s;
+}
+
 void DEMOCLEPacket::get(AtomicFormula & a)
 {
     std::string n;
+    int r;
     stream >> n;
+    stream >> r;
     a.set_name(n);
+    if (r)
+        a.set_as_reactor();
 }
 
 void DEMOCLEPacket::get(std::string & s)
@@ -44,4 +54,7 @@ void DEMOCLEPacket::get(std::string & s)
     stream >> s;
 }
 
-
+void DEMOCLEPacket::get(int & s)
+{
+    stream >> s;
+}

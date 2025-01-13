@@ -87,7 +87,7 @@ int main(int argc , char **argv)
 
     if (!strcmp(argv[1],"--sender")) {
 
-        DEMOCLE::register_protocol("tcp", 4322);
+        DEMOCLE::register_protocol("tcp", "localhost", 4322);
 
         SieveAgent s_agent;
 
@@ -103,7 +103,7 @@ int main(int argc , char **argv)
     }
     else {
 
-        DEMOCLE::register_protocol("tcp", 4321);
+        DEMOCLE::register_protocol("tcp", "localhost", 4321);
 
         Receiver r_agent;
         r_agent.start();

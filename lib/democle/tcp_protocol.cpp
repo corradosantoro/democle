@@ -65,8 +65,8 @@ void tcp_thread_start(TCPProtocol * p)
 }
 
 
-TCPProtocol::TCPProtocol(int port_num)
-    : AbstractProtocol(), port_number(port_num)
+TCPProtocol::TCPProtocol(string _host, int port_num)
+    : AbstractProtocol(), host(_host), port_number(port_num)
 {
     tcp_thread = new thread(tcp_thread_start, this);
     tcp_thread->detach();
@@ -154,11 +154,7 @@ void TCPProtocol::send_message(Agent * sender, url & destination, AtomicFormula 
         return;
     }
 
-    socklen_t peer_address_len;
-    char s[64];
-    getpeername(client_fd, (struct sockaddr *)&peer_address, &peer_address_len);
-    inet_ntop(AF_INET, &peer_address.sin_addr, s, 63);
-    std::string source_url = "tcp://" + string(s) + ":" + std::to_string(port_number) + "/" + sender->get_name();
+    std::string source_url = "tcp://" + host + ":" + std::to_string(port_number) + "/" + sender->get_name();
     DEMOCLEPacket p;
     p.put(source_url);
     p.put(destination.path);

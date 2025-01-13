@@ -15,10 +15,11 @@ class AbstractProtocol {
 
 class TCPProtocol : public AbstractProtocol {
     int port_number;
+    string host;
     thread * tcp_thread;
     int server_fd;
  public:
-    TCPProtocol(int port_num);
+    TCPProtocol(string _host,int port_num);
     virtual void send_message(Agent * sender, url & destination, AtomicFormula & a) override;
     void run();
 };
