@@ -18,6 +18,7 @@ void * thread_start(void * x)
     Agent * a = reinterpret_cast<Agent *>(x);
     //a->dump_accepted_messages();
     a->get_engine()->start();
+    return nullptr;
 }
 
 

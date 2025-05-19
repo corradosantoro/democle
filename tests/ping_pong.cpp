@@ -22,12 +22,16 @@ public:
     Receiver() : Agent("receiver") {};
     void run() {
 
-        accepts(ping/0);
+        accepts(ping/1);
 
-        +ping() >> [] (Context & c)
+        var(X);
+
+        +ping(X) >> [X] (Context & c)
         {
-            cout << "Message received from " << c.sender() << endl;
-            c + (c.sender(), pong());
+            int x = c[X];
+            cout << "Message received from " << c.sender() << "," << x << endl;
+            x++;
+            c + (c.sender(), pong(x));
 
         };
 
@@ -39,20 +43,23 @@ public:
     Sender() : Agent("sender") {};
     void run() {
 
-        accepts(pong/0);
+        accepts(pong/1);
+
+        var(X);
 
         go() >> [](Context & c)
         {
             //c.show_kb();
             cout << "Sending Message" << endl;
-            c + ("tcp://localhost:4321/receiver", ping());
+            c + ("tcp://localhost:4321/receiver", ping(1));
         };
 
-        +pong() >> [] (Context & c)
+        +pong(X) >> [X] (Context & c)
         {
-            cout << "Message received from " << c.sender() << endl;
+            int x = c[X];
+            cout << "Message received from " << c.sender() << "," << x << endl;
             sleep(1);
-            c << go();
+            c + ("tcp://localhost:4321/receiver", ping(x+1));
         };
 
     };
